@@ -249,8 +249,11 @@ public double Encoder1 = EFrontRight.get();
       //System.out.println(error);
     }
 		
-	}
-
+  }
+  
+  /***********/
+  /*DASHBOARD*/
+  /***********/
   public void setDashboard()
   {
     SmartDashboard.putNumber("Joystick Angle", RightStick.getDirectionDegrees());
