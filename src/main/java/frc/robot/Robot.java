@@ -164,7 +164,7 @@ public double Encoder1 = EFrontRight.get();
     }
 
 
-    if (RightStick.getRawButton(2)) //Talon build in PID????
+    if (RightStick.getRawButton(2)) //Talon built in PID????
     {
       //AFrontRight.config_kP(0, 0);
       //AFrontRight.config_kI(0, 0);
@@ -175,14 +175,30 @@ public double Encoder1 = EFrontRight.get();
   
   }
 
+
+  /***************/
+  /*BOOLIN ON 'EM*/
+  /***************/
+
+  public boolean linearDriveDirection() //true if the user is trying to drive the robot straight
+  {
+    if (Math.abs(RightStick.getX()) >= Math.abs(RightStick.getY()) && Math.abs(RightStick.getX()) >= Math.abs(RightStick.getZ())) 
+    return true;
+    if (Math.abs(RightStick.getY()) >= Math.abs(RightStick.getX()) && Math.abs(RightStick.getY()) >= Math.abs(RightStick.getZ())) 
+    return true;
+    else
+    return false;
+  }
+
+  public boolean twistDriveDirection() // true if the user is trying to turn the robot by twisting
+  {
+    if (Math.abs(RightStick.getZ()) >= Math.abs(RightStick.getX()) && Math.abs(RightStick.getZ()) >= Math.abs(RightStick.getY())) 
+    return true;
+    else
+    return false;
+  }
+
   
-
-
-  /* Sets a motor to seek a specific orientation when EncoderNum 
-  is the value of the encoder and JoyNum is the angle being read from
-  the joystick */
-
-
   /********************/
   /*FANCY MATH METHODS*/
   /********************/
@@ -195,7 +211,7 @@ public double Encoder1 = EFrontRight.get();
     return 0;
   }
 
-  public double angull()
+  public double angull() //Outputs Joystick value that corresponds to turning the encoder with degrees from joystick
   {
     if (fixInput(RightStick.getX()) == 0 && fixInput(RightStick.getY()) == 0)
     return 0;
@@ -254,6 +270,7 @@ public double Encoder1 = EFrontRight.get();
   /***********/
   /*DASHBOARD*/
   /***********/
+
   public void setDashboard()
   {
     SmartDashboard.putNumber("Joystick Angle", RightStick.getDirectionDegrees());
