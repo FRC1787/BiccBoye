@@ -46,6 +46,7 @@ public class Robot extends TimedRobot {
 
 
 private final Articulation articulation = Articulation.getInstance();
+private final Camera camera = Camera.getInstance();
 
 //Drive Motor Controller Objects
 public WPI_TalonSRX FrontRight = new WPI_TalonSRX(4);
@@ -216,15 +217,15 @@ public double Encoder1 = EFrontRight.get();
     if (fixInput(RightStick.getX()) == 0 && fixInput(RightStick.getY()) == 0)
     return 0;
     else
-    return RightStick.getDirectionDegrees()*5.555;
+    return continuousAngle()*5.555;
   }
 
-  public double raydeeins()
+  public double continuousAngle()
   {
-    if (fixInput(RightStick.getX()) == 0 && fixInput(RightStick.getY()) == 0)
-    return 0;
+    if (RightStick.getDirectionDegrees() >= 0)
+    return RightStick.getDirectionDegrees();
     else
-    return RightStick.getDirectionRadians();
+    return RightStick.getDirectionDegrees() + 360;
   }
  
   private double truncateMotorOutput(double motorOutput) 
@@ -274,9 +275,9 @@ public double Encoder1 = EFrontRight.get();
   public void setDashboard()
   {
     SmartDashboard.putNumber("Joystick Angle", RightStick.getDirectionDegrees());
+    SmartDashboard.putNumber("Stick Corrected", continuousAngle());
     SmartDashboard.putNumber("Encoder Value", EFrontRight.get());
     SmartDashboard.putNumber("Angull", angull());
-    SmartDashboard.putNumber("Raydeeins", raydeeins());
   }
 
   public void getDashboard(){}
