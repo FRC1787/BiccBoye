@@ -35,8 +35,6 @@ import edu.wpi.first.wpilibj.command.PIDSubsystem;
 
 import java.lang.Math;
 
-
-
 public class Robot extends TimedRobot {
 
 
@@ -56,9 +54,9 @@ public WPI_TalonSRX BackLeft = new WPI_TalonSRX(4);
 
 //Articulation Motor Controller Objects
 public WPI_TalonSRX AFrontRight = new WPI_TalonSRX(6);
-//public WPI_TalonSRX AFrontLeft = new WPI_TalonSRX();
-//public WPI_TalonSRX ABackRight = new WPI_TalonSRX();
-//public WPI_TalonSRX ABackLeft = new WPI_TalonSRX(8);
+public WPI_TalonSRX AFrontLeft = new WPI_TalonSRX(5);
+public WPI_TalonSRX ABackRight = new WPI_TalonSRX(7);
+public WPI_TalonSRX ABackLeft = new WPI_TalonSRX(8);
 
 //PID Test Talons
 public TalonSRX TalonSrx = new TalonSRX(15);
@@ -75,6 +73,8 @@ public static Encoder EFrontRight = new Encoder(0, 1);       //Encoder 1 Setup
 public Encoder EFrontLeft = new Encoder(2,3);         //Encoder 2 Setup
 //public DigitalInput Encoder2A = new DigitalInput(2);
 //public DigitalInput Encoder2B = new DigitalInput(3);
+public Encoder EBackLeft = new Encoder(4, 5);
+public Encoder EBackRight = new Encoder(6,7);
 
 
 
@@ -85,7 +85,7 @@ public Encoder EFrontLeft = new Encoder(2,3);         //Encoder 2 Setup
 
 //final PID values
 private final double PROPORTIONAL_TWEAK_CONSTANT = 0.0004; //0.0004
-private final double INTEGRAL_TWEAK_CONSTANT = 0.0000072; //.000007
+private final double INTEGRAL_TWEAK_CONSTANT = 0.0000078; //.000007
 private final double DERIVATIVE__TWEAK_CONSTANT = 0;
 private final double ACCEPTABLE_ERROR_RANGE = 0.0;
 
@@ -121,33 +121,9 @@ public double Encoder1 = EFrontRight.get();
     this.myPeriodic();
   }
 
-  public void testPeriodic() {}
-
-  public void myPeriodic() 
+  public void testPeriodic() 
   {
-    
-    
-    
-    //Drive Wheel Logic
-    if (Math.abs(RightStick.getX()) >= Math.abs(RightStick.getY()) && Math.abs(RightStick.getX()) >= Math.abs(RightStick.getZ())) 
-    {
-      FrontRight.set(RightStick.getX());
-    }
-    
-    if (Math.abs(RightStick.getY()) >= Math.abs(RightStick.getX()) && Math.abs(RightStick.getY()) >= Math.abs(RightStick.getZ())) 
-    {
-      FrontRight.set(RightStick.getY());
-    }
-
-    if (Math.abs(RightStick.getZ()) >= Math.abs(RightStick.getX()) && Math.abs(RightStick.getZ()) >= Math.abs(RightStick.getY())) 
-    {
-      FrontRight.set(RightStick.getZ());
-    }
-
-
-    //Module Articulation Logic
-
-    /* For future reference I want to make it so a degree value coming from the joystick
+        /* For future reference I want to make it so a degree value coming from the joystick
     is translated to be representative of a value from the encoder so that when an angle is recieved from the joystick
     the robot tries to set the encoder value equal to the joystick value by articulating the motor */
 
@@ -157,12 +133,14 @@ public double Encoder1 = EFrontRight.get();
 
     if (RightStick.getThrottle() > 0)
     {
-      pIDDrive(AFrontRight, angull());
+      pIDDrive(AFrontRight, minTurnDistance(EFrontRight, -45));
+      //pIDDrive(AFrontRight, angull());
     }
     else
     {
       AFrontRight.set(0);
     }
+
 
 
     if (RightStick.getRawButton(2)) //Talon built in PID????
@@ -173,6 +151,71 @@ public double Encoder1 = EFrontRight.get();
       //AFrontRight.configMotionCruiseVelocity(500);
       //AFrontRight.Motion
     }
+  }
+
+  public void myPeriodic() 
+  {
+    
+    
+    
+    //Drive Wheel Logic
+    if (Math.abs(RightStick.getX()) >= Math.abs(RightStick.getY()) && Math.abs(RightStick.getX()) >= Math.abs(RightStick.getZ())) 
+    {
+      FrontRight.set(RightStick.getX());
+      FrontLeft.set(RightStick.getX());
+      BackRight.set(RightStick.getX());
+      BackLeft.set(RightStick.getX());
+    }
+    
+    else if (Math.abs(RightStick.getY()) >= Math.abs(RightStick.getX()) && Math.abs(RightStick.getY()) >= Math.abs(RightStick.getZ())) 
+    {
+      FrontRight.set(RightStick.getY());
+      FrontLeft.set(RightStick.getY());
+      BackRight.set(RightStick.getY());
+      BackLeft.set(RightStick.getY());
+    }
+
+    else if (Math.abs(RightStick.getZ()) >= Math.abs(RightStick.getX()) && Math.abs(RightStick.getZ()) >= Math.abs(RightStick.getY())) 
+    {
+      FrontRight.set(RightStick.getZ());
+      FrontLeft.set(RightStick.getZ());
+      BackRight.set(RightStick.getZ());
+      BackLeft.set(RightStick.getZ());
+    }
+    else
+    {
+      FrontRight.set(0);
+      FrontLeft.set(0);
+      BackRight.set(0);
+      BackLeft.set(0);
+    }
+
+
+    //Wheel Articulation Logic
+
+    if (linearDriveDirection())
+    {
+      pIDDrive(AFrontRight, angull());
+      pIDDrive(AFrontLeft, angull());
+      pIDDrive(ABackRight, angull());
+      pIDDrive(ABackLeft, angull());
+    }
+    else if (twistDriveDirection())
+    {
+      pIDDrive(AFrontRight, minTurnDistance(EFrontRight, -45));
+      pIDDrive(AFrontLeft, minTurnDistance(EFrontLeft, 45));
+      pIDDrive(ABackRight, minTurnDistance(EBackRight, 45));
+      pIDDrive(ABackLeft, minTurnDistance(EBackLeft, -45));
+    }
+    else
+    {
+      pIDDrive(AFrontRight, 0);
+      pIDDrive(AFrontLeft, 0);
+      pIDDrive(ABackRight, 0);
+      pIDDrive(ABackLeft, 0);
+    }
+
+
   
   }
 
@@ -204,7 +247,7 @@ public double Encoder1 = EFrontRight.get();
   /*FANCY MATH METHODS*/
   /********************/
 
-  public double fixInput(double joyNum)
+  public double fixInput(double joyNum) //Adds deadzone to the center of the Joystick
   {
     if (joyNum > .15 || joyNum < .15)
     return joyNum;
@@ -220,15 +263,28 @@ public double Encoder1 = EFrontRight.get();
     return continuousAngle()*5.555;
   }
 
-  public double continuousAngle()
+  public double encoderNumber(double angle) //Translates Joystick to Encoder value
+  {
+    return angle*5.555;
+  }
+
+  public double continuousAngle() //Shifts bounds for when values are send to PID
   {
     if (RightStick.getDirectionDegrees() >= 0)
     return RightStick.getDirectionDegrees();
     else
     return RightStick.getDirectionDegrees() + 360;
   }
+
+  public double minTurnDistance(Encoder encoder, double setPoint) //Finds shortest path to the setPoint
+  {
+    if (Math.abs(Math.abs(encoder.get()) - Math.abs(encoderNumber(setPoint))) > Math.abs(Math.abs(encoder.get()) - (360 + Math.abs(encoderNumber(setPoint)))))
+    return encoderNumber(setPoint + 360);
+    else
+    return encoderNumber(setPoint);
+  }
  
-  private double truncateMotorOutput(double motorOutput) 
+  private double truncateMotorOutput(double motorOutput) //Whatever the heck Jake and Van did
   {
 		if (motorOutput > 1) {
 			return 0.5;
@@ -278,16 +334,13 @@ public double Encoder1 = EFrontRight.get();
     SmartDashboard.putNumber("Stick Corrected", continuousAngle());
     SmartDashboard.putNumber("Encoder Value", EFrontRight.get());
     SmartDashboard.putNumber("Angull", angull());
+    SmartDashboard.putNumber("Minimum Turn", minTurnDistance(EFrontRight, -45));
   }
 
   public void getDashboard(){}
   
 
 }
- 
-  
-
-
 
 
 // Stuff to remember
