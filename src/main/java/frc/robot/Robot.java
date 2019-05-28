@@ -255,7 +255,7 @@ public double Encoder1 = EFrontRight.get();
     return 0;
   }
 
-  public double angull() //Outputs Joystick value that corresponds to turning the encoder with degrees from joystick
+  public double angull() //changes Joystick input to Encoder ticks
   {
     if (fixInput(RightStick.getX()) == 0 && fixInput(RightStick.getY()) == 0)
     return 0;
@@ -263,7 +263,7 @@ public double Encoder1 = EFrontRight.get();
     return continuousAngle()*5.555;
   }
 
-  public double encoderNumber(double angle) //Translates Joystick to Encoder value
+  public double encoderNumber(double angle) //Translates an angle to Encoder value
   {
     return angle*5.555;
   }
