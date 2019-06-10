@@ -30,8 +30,6 @@ public static Articulation getInstance()
 
 
 
-//double P = SmartDashboard.getNumber("P", P);
-
   public WPI_TalonSRX bruh = new WPI_TalonSRX(1);
   public Articulation() {
     // Intert a subsystem name and PID values here

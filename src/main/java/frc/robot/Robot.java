@@ -17,21 +17,12 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 
 import com.ctre.phoenix.motorcontrol.IMotorController;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DigitalOutput;
-import edu.wpi.first.wpilibj.PIDBase;
-import edu.wpi.first.wpilibj.command.PIDCommand;
-import edu.wpi.first.wpilibj.PIDController;
-import edu.wpi.first.wpilibj.PIDInterface;
-import edu.wpi.first.wpilibj.PIDOutput;
-import edu.wpi.first.wpilibj.PIDSource;
-import edu.wpi.first.wpilibj.PIDSourceType;
-import edu.wpi.first.wpilibj.Talon;
-import edu.wpi.first.wpilibj.command.PIDSubsystem;
+import com.ctre.phoenix.sensors.*;
+
 
 import java.lang.Math;
 
@@ -58,9 +49,9 @@ public WPI_TalonSRX AFrontLeft = new WPI_TalonSRX(5);
 public WPI_TalonSRX ABackRight = new WPI_TalonSRX(7);
 public WPI_TalonSRX ABackLeft = new WPI_TalonSRX(8);
 
-//PID Test Talons
+/*PID Test Talons
 public TalonSRX TalonSrx = new TalonSRX(15);
-public WPI_TalonSRX WPITalon = new WPI_TalonSRX(16);
+public WPI_TalonSRX WPITalon = new WPI_TalonSRX(16); */
 
 //Joystick Objects
 public Joystick RightStick = new Joystick(0);
@@ -85,7 +76,7 @@ public Encoder EBackRight = new Encoder(6,7);
 
 //final PID values
 private final double PROPORTIONAL_TWEAK_CONSTANT = 0.0004; //0.0004
-private final double INTEGRAL_TWEAK_CONSTANT = 0.0000078; //.000007
+private final double INTEGRAL_TWEAK_CONSTANT = 0.0000057; //.000007
 private final double DERIVATIVE__TWEAK_CONSTANT = 0;
 private final double ACCEPTABLE_ERROR_RANGE = 0.0;
 
@@ -99,6 +90,8 @@ private double pIDMotorVoltage = 0;
 
 //Things to use
 public double Encoder1 = EFrontRight.get();
+public double magPW = AFrontRight.getSelectedSensorPosition(1);
+
 
 
   public void robotInit() 
@@ -133,8 +126,8 @@ public double Encoder1 = EFrontRight.get();
 
     if (RightStick.getThrottle() > 0)
     {
-      pIDDrive(AFrontRight, minTurnDistance(EFrontRight, -45));
-      //pIDDrive(AFrontRight, angull());
+      //pIDDrive(AFrontRight, minTurnDistance(EFrontRight, -45));
+      pIDDrive(AFrontRight, angull());
     }
     else
     {
@@ -157,7 +150,6 @@ public double Encoder1 = EFrontRight.get();
   {
     
     
-    
     //Drive Wheel Logic
     if (Math.abs(RightStick.getX()) >= Math.abs(RightStick.getY()) && Math.abs(RightStick.getX()) >= Math.abs(RightStick.getZ())) 
     {
@@ -166,7 +158,6 @@ public double Encoder1 = EFrontRight.get();
       BackRight.set(RightStick.getX());
       BackLeft.set(RightStick.getX());
     }
-    
     else if (Math.abs(RightStick.getY()) >= Math.abs(RightStick.getX()) && Math.abs(RightStick.getY()) >= Math.abs(RightStick.getZ())) 
     {
       FrontRight.set(RightStick.getY());
@@ -174,7 +165,6 @@ public double Encoder1 = EFrontRight.get();
       BackRight.set(RightStick.getY());
       BackLeft.set(RightStick.getY());
     }
-
     else if (Math.abs(RightStick.getZ()) >= Math.abs(RightStick.getX()) && Math.abs(RightStick.getZ()) >= Math.abs(RightStick.getY())) 
     {
       FrontRight.set(RightStick.getZ());
@@ -268,8 +258,9 @@ public double Encoder1 = EFrontRight.get();
     return angle*5.555;
   }
 
-  public double continuousAngle() //Shifts bounds for when values are send to PID
+  public double continuousAngle() //Shifts bounds for when values are sent to PID
   {
+
     if (RightStick.getDirectionDegrees() >= 0)
     return RightStick.getDirectionDegrees();
     else
@@ -335,6 +326,7 @@ public double Encoder1 = EFrontRight.get();
     SmartDashboard.putNumber("Encoder Value", EFrontRight.get());
     SmartDashboard.putNumber("Angull", angull());
     SmartDashboard.putNumber("Minimum Turn", minTurnDistance(EFrontRight, -45));
+    SmartDashboard.putNumber("Absolute", magPW);
   }
 
   public void getDashboard(){}
