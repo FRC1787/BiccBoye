@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import com.ctre.phoenix.motorcontrol.IMotorController;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DigitalOutput;
 import com.ctre.phoenix.sensors.*;
@@ -97,6 +98,8 @@ public double magPW = AFrontRight.getSelectedSensorPosition(1);
   public void robotInit() 
   {
     this.setDashboard();
+    initQuadrature();
+    AFrontRight.configSelectedFeedbackSensor(FeedbackDevice.PulseWidthEncodedPosition);
   }
 
   public void robotPeriodic() 
@@ -208,6 +211,14 @@ public double magPW = AFrontRight.getSelectedSensorPosition(1);
 
   
   }
+
+
+
+  public void initQuadrature() {
+		/* get the absolute pulse width position */
+    int pulseWidth = AFrontRight.getSensorCollection().getPulseWidthPosition();
+  }
+
 
 
   /***************/
@@ -326,7 +337,7 @@ public double magPW = AFrontRight.getSelectedSensorPosition(1);
     SmartDashboard.putNumber("Encoder Value", EFrontRight.get());
     SmartDashboard.putNumber("Angull", angull());
     SmartDashboard.putNumber("Minimum Turn", minTurnDistance(EFrontRight, -45));
-    SmartDashboard.putNumber("Absolute", magPW);
+    SmartDashboard.putNumber("Absolute", AFrontRight.getSensorCollection().getPulseWidthPosition()*(360/4096));
   }
 
   public void getDashboard(){}
